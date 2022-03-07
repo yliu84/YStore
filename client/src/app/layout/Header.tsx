@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
-// import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 interface Props {
   darkMode: boolean;
@@ -52,20 +52,14 @@ const Header = ({ darkMode, handleThemeChange }: Props) => {
         }}
       >
         <Box display='flex' alignItems='center'>
-          <Typography
-            variant='h6'
-            // component={NavLink}
-            // exact
-            // to='/'
-            // sx={navStyles}
-          >
+          <Typography variant='h6' component={NavLink} to='/' sx={navStyles}>
             Y-STORE
           </Typography>
           <Switch checked={darkMode} onChange={handleThemeChange} />
         </Box>
         <List sx={{ display: 'flex' }}>
           {midLinks.map(({ title, path }) => (
-            <ListItem key={path} sx={navStyles}>
+            <ListItem component={NavLink} to={path} key={path} sx={navStyles}>
               {title.toUpperCase()}
             </ListItem>
           ))}
@@ -77,12 +71,12 @@ const Header = ({ darkMode, handleThemeChange }: Props) => {
         </List>
         <Box display='flex' alignItems='center'>
           <IconButton
-            // component={Link}
-            // to='/basket'
+            component={Link}
+            to='/basket'
             size='large'
             sx={{ color: 'inherit' }}
           >
-            <Badge badgeContent={0} color='secondary'>
+            <Badge badgeContent={4} color='secondary'>
               <ShoppingCart />
             </Badge>
           </IconButton>
@@ -104,7 +98,7 @@ const Header = ({ darkMode, handleThemeChange }: Props) => {
           )} */}
           <List sx={{ display: 'flex' }}>
             {rightLinks.map(({ title, path }) => (
-              <ListItem key={path} sx={navStyles}>
+              <ListItem component={NavLink} to={path} key={path} sx={navStyles}>
                 {title.toUpperCase()}
               </ListItem>
             ))}
