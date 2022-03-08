@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import { LoadingButton } from '@mui/lab';
 import {
   Divider,
   Grid,
@@ -14,21 +15,29 @@ import {
 } from '@mui/material';
 import NotFound from '../../app/errors/NotFound';
 import { Product } from '../../app/models/product';
-import { LoadingButton } from '@mui/lab';
+import agent from '../../app/api/agent';
+import LoadingComponent from '../../app/layout/LoadingComponent';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const [quantity, setQuantity] = useState(0);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/products/${id}`)
-      .then((response) => setProduct(response.data))
+    agent.Catalog.details(parseInt(id))
+      .then((response) => setProduct(response))
       .catch((error) => console.log(error))
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleInputChange = (event: any) => {
+    if (event.target.value > 0) {
+      setQuantity(parseInt(event.target.value));
+    }
+  };
+
+  if (loading) return <LoadingComponent message='Loading product...' />;
   if (!product) return <NotFound />;
 
   return (
@@ -80,7 +89,7 @@ const ProductDetails = () => {
               label='Quantity in Cart'
               fullWidth
               value={1}
-              //   onChange={handleInputChange}
+              onChange={handleInputChange}
             />
           </Grid>
           <Grid item xs={6}>

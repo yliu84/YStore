@@ -9,7 +9,7 @@ import {
 import { ToastContainer } from 'react-toastify';
 import LoadingComponent from './LoadingComponent';
 import Header from './Header';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import Catalog from '../../features/catalog/Catalog';
 import NotFound from '../errors/NotFound';
 import Login from '../../features/account/Login';
@@ -18,6 +18,8 @@ import HomePage from '../../features/home/HomePage';
 import AboutPage from '../../features/about/AboutPage';
 import ContactPage from '../../features/contact/ContactPage';
 import ProductDetails from '../../features/catalog/ProductDetails';
+import ServerError from '../errors/ServerError';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -44,20 +46,32 @@ function App() {
       <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
       <CssBaseline />
       <Header darkMode={darkMode} handleThemeChange={handleThemeChange} />
-
-      <Container sx={{ mt: 4 }}>
-        <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/catalog' element={<Catalog />} />
-          <Route path='/catalog/:id' element={<ProductDetails />} />
-          <Route path='/about' element={<AboutPage />} />
-          <Route path='/contact' element={<ContactPage />} />
-          {/* <Route path='/server-error' element={ServerError} /> */}
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='*' element={<NotFound />} />
-        </Routes>
-      </Container>
+      <Route exact path='/' component={HomePage} />
+      <Route
+        path={'/(.+)'}
+        render={() => (
+          <Container sx={{ mt: 4 }}>
+            <Switch>
+              <Route exact path='/catalog' component={Catalog} />
+              <Route path='/catalog/:id' component={ProductDetails} />
+              <Route path='/about' component={AboutPage} />
+              <Route path='/contact' component={ContactPage} />
+              <Route path='/server-error' component={ServerError} />
+              {/* <Route path='/basket' component={BasketPage} /> */}
+              {/* <PrivateRoute path='/checkout' component={CheckoutWrapper} /> */}
+              {/* <PrivateRoute path='/orders' component={Orders} /> */}
+              {/* <PrivateRoute
+                roles={['Admin']}
+                path='/inventory'
+                component={Inventory}
+              /> */}
+              <Route path='/login' component={Login} />
+              <Route path='/register' component={Register} />
+              <Route component={NotFound} />
+            </Switch>
+          </Container>
+        )}
+      />
     </ThemeProvider>
   );
 }
