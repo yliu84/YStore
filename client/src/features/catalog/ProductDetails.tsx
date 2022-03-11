@@ -17,23 +17,46 @@ import NotFound from '../../app/errors/NotFound';
 import { Product } from '../../app/models/product';
 import agent from '../../app/api/agent';
 import LoadingComponent from '../../app/layout/LoadingComponent';
+import { useStoreContext } from '../../app/context/StoreContext';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const { basket, setBasket, removeItem } = useStoreContext();
   const [quantity, setQuantity] = useState(0);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(true);
+
+  const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
+    if (item) setQuantity(item.quantity);
     agent.Catalog.details(parseInt(id))
       .then((response) => setProduct(response))
       .catch((error) => console.log(error))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, item]);
 
   const handleInputChange = (event: any) => {
-    if (event.target.value > 0) {
+    if (event.target.value >= 0) {
       setQuantity(parseInt(event.target.value));
+    }
+  };
+
+  const handleUpdateCart = () => {
+    setSubmitting(true);
+    if (!item || quantity > item.quantity) {
+      const updatedQuantity = item ? quantity - item.quantity : quantity;
+      agent.Basket.addItem(product?.id!, updatedQuantity)
+        .then((basket) => setBasket(basket))
+        .catch((error) => console.log(error))
+        .finally(() => setSubmitting(false));
+    } else {
+      const updatedQuantity = item.quantity - quantity;
+      agent.Basket.removeItem(product?.id!, updatedQuantity)
+        .then(() => removeItem(product?.id!, updatedQuantity))
+        .catch((error) => console.log(error))
+        .finally(() => setSubmitting(false));
     }
   };
 
@@ -88,23 +111,25 @@ const ProductDetails = () => {
               type='number'
               label='Quantity in Cart'
               fullWidth
-              value={1}
+              value={quantity}
               onChange={handleInputChange}
             />
           </Grid>
           <Grid item xs={6}>
             <LoadingButton
-              //   disabled={item?.quantity === quantity}
+              disabled={
+                item?.quantity === quantity || (!item && quantity === 0)
+              }
               //   loading={status.includes('pending')}
-              //   onClick={handleUpdateCart}
+              loading={submitting}
+              onClick={handleUpdateCart}
               sx={{ height: '55px' }}
               color='primary'
               size='large'
               variant='contained'
               fullWidth
             >
-              {/* {item ? 'Update Quantity' : 'Add to Cart'} */}
-              'Add to Cart'
+              {item ? 'Update Quantity' : 'Add to Cart'}
             </LoadingButton>
           </Grid>
         </Grid>

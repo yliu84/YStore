@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Avatar,
   Button,
@@ -12,12 +12,27 @@ import {
 import { Link } from 'react-router-dom';
 import { Product } from '../../app/models/product';
 import { currencyFormat } from '../../app/util/util';
+import agent from '../../app/api/agent';
+import { LoadingButton } from '@mui/lab';
+import { SettingsBackupRestoreTwoTone } from '@mui/icons-material';
+import { useStoreContext } from '../../app/context/StoreContext';
 
 interface Props {
   product: Product;
 }
 
 const ProductCard = ({ product }: Props) => {
+  const [loading, setLoading] = useState(false);
+  const { setBasket } = useStoreContext();
+
+  const handleAddItem = (productId: number) => {
+    setLoading(true);
+    agent.Basket.addItem(productId)
+      .then((basket) => setBasket(basket))
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false));
+  };
+
   return (
     <Card>
       <CardHeader
@@ -58,6 +73,13 @@ const ProductCard = ({ product }: Props) => {
         >
           Add to cart
         </LoadingButton> */}
+        <LoadingButton
+          loading={loading}
+          onClick={() => handleAddItem(product.id)}
+          size='small'
+        >
+          Add to cart
+        </LoadingButton>
         <Button component={Link} to={`/catalog/${product.id}`} size='small'>
           View
         </Button>
