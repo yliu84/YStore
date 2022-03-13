@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   TableContainer,
   Paper,
@@ -13,20 +12,18 @@ import { LoadingButton } from '@mui/lab';
 import { Box } from '@mui/system';
 
 import { BasketItem } from '../../app/models/basket';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { addBasketItemAsync, removeBasketItemAsync } from './basketSlice';
 
 interface Props {
   items: BasketItem[];
-  handleAddItem: (productId: number, name: string) => void;
-  handleRemoveItem: (productId: number, quantity: number, name: string) => void;
   isBasket?: boolean;
 }
 
-const BasketTable = ({
-  items,
-  handleAddItem,
-  handleRemoveItem,
-  isBasket = true,
-}: Props) => {
+const BasketTable = ({ items, isBasket = true }: Props) => {
+  const { status } = useAppSelector((state) => state.basket);
+  const dispatch = useAppDispatch();
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }}>
@@ -61,20 +58,17 @@ const BasketTable = ({
               <TableCell align='center'>
                 {isBasket && (
                   <LoadingButton
-                    // loading={
-                    //   status === 'pendingRemoveItem' + item.productId + 'rem'
-                    // }
-                    // onClick={() =>
-                    //   dispatch(
-                    //     removeBasketItemAsync({
-                    //       productId: item.productId,
-                    //       quantity: 1,
-                    //       name: 'rem',
-                    //     })
-                    //   )
-                    // }
+                    loading={
+                      status === 'pendingRemoveItem' + item.productId + 'rem'
+                    }
                     onClick={() =>
-                      handleRemoveItem(item.productId, 1, item.name)
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: 1,
+                          name: 'rem',
+                        })
+                      )
                     }
                     color='error'
                   >
@@ -84,13 +78,12 @@ const BasketTable = ({
                 {item.quantity}
                 {isBasket && (
                   <LoadingButton
-                    // loading={status === 'pendingAddItem' + item.productId}
-                    // onClick={() =>
-                    //   dispatch(
-                    //     addBasketItemAsync({ productId: item.productId })
-                    //   )
-                    // }
-                    onClick={() => handleAddItem(item.productId, item.name)}
+                    loading={status === 'pendingAddItem' + item.productId}
+                    onClick={() =>
+                      dispatch(
+                        addBasketItemAsync({ productId: item.productId })
+                      )
+                    }
                     color='secondary'
                   >
                     <Add />
@@ -103,18 +96,18 @@ const BasketTable = ({
               {isBasket && (
                 <TableCell align='right'>
                   <LoadingButton
-                    // loading={
-                    //   status === 'pendingRemoveItem' + item.productId + 'del'
-                    // }
-                    // onClick={() =>
-                    //   dispatch(
-                    //     removeBasketItemAsync({
-                    //       productId: item.productId,
-                    //       quantity: item.quantity,
-                    //       name: 'del',
-                    //     })
-                    //   )
-                    // }
+                    loading={
+                      status === 'pendingRemoveItem' + item.productId + 'del'
+                    }
+                    onClick={() =>
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: item.quantity,
+                          name: 'del',
+                        })
+                      )
+                    }
                     color='error'
                   >
                     <Delete />

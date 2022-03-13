@@ -1,16 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Grid, Paper } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Grid } from '@mui/material';
 import ProductList from './ProductList';
-import { Product } from '../../app/models/product';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { fetchProductsAsync, productSelectors } from './catalogSlice';
+import LoadingComponent from '../../app/layout/LoadingComponent';
 
 const Catalog = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const products = useAppSelector(productSelectors.selectAll);
+  const { productsLoaded, status } = useAppSelector((state) => state.catalog);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
-      .then((response) => response.json())
-      .then((data) => setProducts(data));
-  }, []);
+    if (!productsLoaded) dispatch(fetchProductsAsync());
+  }, [productsLoaded, dispatch]);
+
+  if (status.includes('pending'))
+    return <LoadingComponent message='Loading products...' />;
 
   return (
     <Grid container columnSpacing={4}>

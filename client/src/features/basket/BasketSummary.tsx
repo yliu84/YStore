@@ -8,14 +8,15 @@ import {
   TableCell,
 } from '@mui/material';
 import { currencyFormat } from '../../app/util/util';
-import { useStoreContext } from '../../app/context/StoreContext';
+import { useAppSelector } from '../../app/store/configureStore';
 
 interface Props {
   subtotal?: number;
 }
 
 const BasketSummary = ({ subtotal }: Props) => {
-  const { basket } = useStoreContext();
+  // const { basket } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
 
   if (subtotal === undefined)
     subtotal =
