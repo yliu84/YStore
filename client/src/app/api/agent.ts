@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import {history} from '../..'
+import { PaginatedResponse } from "../models/pagination";
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
@@ -11,11 +12,12 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 axios.interceptors.response.use(async response => {
     if (process.env.NODE_ENV === 'development') await sleep();
-    // const pagination = response.headers['pagination'];
-    // if (pagination) {
-    //     response.data = new PaginatedResponse(response.data, JSON.parse(pagination));
-    //     return response;
-    // }
+    
+    const pagination = response.headers['pagination'];
+    if (pagination) {
+        response.data = new PaginatedResponse(response.data, JSON.parse(pagination));
+        return response;
+    }
     return response;
 }, (error: AxiosError) => {
     const { data, status } = error.response!;
@@ -64,7 +66,7 @@ const requests = {
 }
 
 const Catalog = {
-    list: () => requests.get('products'),
+    list: (params: URLSearchParams) => requests.get('products',params),
     details: (id: number) => requests.get(`products/${id}`),
     fetchFilters: () => requests.get('products/filters')
 }
