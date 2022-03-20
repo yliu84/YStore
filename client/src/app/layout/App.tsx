@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   Container,
@@ -24,7 +24,11 @@ import BasketPage from '../../features/basket/BasketPage';
 import { getCookie } from '../util/util';
 import agent from '../api/agent';
 import { useAppDispatch } from '../store/configureStore';
-import { setBasket } from '../../features/basket/basketSlice';
+import { fetchBasketAsync, setBasket } from '../../features/basket/basketSlice';
+import { fetchCurrentUser } from '../../features/account/accountSlice';
+import CheckoutPage from '../../features/checkout/CheckoutPage';
+import PrivateRoute from './PrivateRoute';
+import Orders from '../../features/orders/Orders';
 
 function App() {
   // const { setBasket } = useStoreContext();
@@ -32,17 +36,18 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    const buyerId = getCookie('buyerId');
-    if (buyerId) {
-      agent.Basket.get()
-        .then((basket) => dispatch(setBasket(basket)))
-        .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+  const initApp = useCallback(async () => {
+    try {
+      await dispatch(fetchCurrentUser());
+      await dispatch(fetchBasketAsync());
+    } catch (error) {
+      console.log(error);
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    initApp().then(() => setLoading(false));
+  }, [initApp]);
 
   const paletteType = darkMode ? 'dark' : 'light';
 
@@ -77,8 +82,8 @@ function App() {
               <Route path='/contact' component={ContactPage} />
               <Route path='/server-error' component={ServerError} />
               <Route path='/basket' component={BasketPage} />
-              {/* <PrivateRoute path='/checkout' component={CheckoutWrapper} /> */}
-              {/* <PrivateRoute path='/orders' component={Orders} /> */}
+              <PrivateRoute path='/checkout' component={CheckoutPage} />
+              <PrivateRoute path='/orders' component={Orders} />
               {/* <PrivateRoute
                 roles={['Admin']}
                 path='/inventory'
