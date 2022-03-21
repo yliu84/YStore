@@ -99,13 +99,23 @@ const Account = {
     fetchAddress: () => requests.get('account/savedAddress')
 }
 
+const Orders = {
+    list: () => requests.get('orders'),
+    fetch: (id: number) => requests.get(`orders/${id}`),
+    create: (values: any) => requests.post('orders', values)
+}
+
+const Payments = {
+    createPaymentIntent: () => requests.post('payments', {})
+}
+
 const agent = {
     Catalog,
     TestErrors,
     Basket,
     Account,
-    // Orders,
-    // Payments,
+    Orders,
+    Payments,
     // Admin
 }
 

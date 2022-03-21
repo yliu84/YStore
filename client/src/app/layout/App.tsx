@@ -21,14 +21,12 @@ import ProductDetails from '../../features/catalog/ProductDetails';
 import ServerError from '../errors/ServerError';
 import 'react-toastify/dist/ReactToastify.css';
 import BasketPage from '../../features/basket/BasketPage';
-import { getCookie } from '../util/util';
-import agent from '../api/agent';
 import { useAppDispatch } from '../store/configureStore';
-import { fetchBasketAsync, setBasket } from '../../features/basket/basketSlice';
+import { fetchBasketAsync } from '../../features/basket/basketSlice';
 import { fetchCurrentUser } from '../../features/account/accountSlice';
-import CheckoutPage from '../../features/checkout/CheckoutPage';
 import PrivateRoute from './PrivateRoute';
 import Orders from '../../features/orders/Orders';
+import CheckoutWrapper from '../../features/checkout/CheckoutWrapper';
 
 function App() {
   // const { setBasket } = useStoreContext();
@@ -82,7 +80,7 @@ function App() {
               <Route path='/contact' component={ContactPage} />
               <Route path='/server-error' component={ServerError} />
               <Route path='/basket' component={BasketPage} />
-              <PrivateRoute path='/checkout' component={CheckoutPage} />
+              <PrivateRoute path='/checkout' component={CheckoutWrapper} />
               <PrivateRoute path='/orders' component={Orders} />
               {/* <PrivateRoute
                 roles={['Admin']}
