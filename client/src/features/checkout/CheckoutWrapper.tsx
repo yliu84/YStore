@@ -8,12 +8,12 @@ import { setBasket } from '../basket/basketSlice';
 import CheckoutPage from './CheckoutPage';
 
 const stripePromise = loadStripe(
-  'pk_test_51IPxTFLks4SeB2vAbYAy4WgcZOfUvqRuRPSgH5BSiPfCJKWuNpFdYXWMgLbNq54pZnkG2GjhH0byOF4TPsybTYNF00yd42zd9H'
+  'pk_test_51Kfs0cDVYZRyLFmHkzgAu48LD8dCGCAstPCZKRFZoInQj2jHjFgen69PqIObFuTL7ZQaEK1WCF1IOHOZk66iQkc300UtKMiRen'
 );
 
 const CheckoutWrapper = () => {
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     agent.Payments.createPaymentIntent()
