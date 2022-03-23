@@ -8,10 +8,13 @@ import { setBasket } from "../basket/basketSlice";
 
 interface AccountState {
     user: User | null;
+    loadingUser: boolean;
 }
 
 const initialState: AccountState = {
-    user: null
+    user: null,
+    loadingUser:true
+
 }
 
 export const signInUser = createAsyncThunk<User, FieldValues>(
@@ -38,7 +41,7 @@ export const fetchCurrentUser = createAsyncThunk<User>(
             const {basket, ...user} = userDto;
             if (basket) thunkAPI.dispatch(setBasket(basket));
             localStorage.setItem('user', JSON.stringify(user));
-            return user;
+            return user;   
         } catch (error: any) {
             return thunkAPI.rejectWithValue({error: error.data});
         }
@@ -66,8 +69,10 @@ export const accountSlice = createSlice({
         }
     },
      extraReducers: (builder => {
+
           builder.addCase(fetchCurrentUser.rejected, (state) => {
             state.user = null;
+            state.loadingUser = false;
             localStorage.removeItem('user');
             toast.error('Session expired - please login again');
             history.push('/');
@@ -76,6 +81,8 @@ export const accountSlice = createSlice({
             let claims = JSON.parse(atob(action.payload.token.split('.')[1]));
             let roles = claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
             state.user = {...action.payload, roles: typeof(roles) === 'string' ? [roles] : roles};
+            state.loadingUser = false;
+   
         });
         builder.addMatcher(isAnyOf(signInUser.rejected), (state, action) => {
             throw action.payload;

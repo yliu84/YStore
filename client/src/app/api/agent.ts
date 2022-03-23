@@ -72,6 +72,20 @@ const requests = {
     }).then(responseBody)
 }
 
+function createFormData(item: any) {
+    let formData = new FormData();
+    for (const key in item) {
+        formData.append(key, item[key])
+    }
+    return formData;
+}
+
+const Admin = {
+    createProduct: (product: any) => requests.postForm('products', createFormData(product)),
+    updateProduct: (product: any) => requests.putForm('products', createFormData(product)),
+    deleteProduct: (id: number) => requests.delete(`products/${id}`)
+}
+
 const Catalog = {
     list: (params: URLSearchParams) => requests.get('products',params),
     details: (id: number) => requests.get(`products/${id}`),
@@ -116,7 +130,7 @@ const agent = {
     Account,
     Orders,
     Payments,
-    // Admin
+    Admin
 }
 
 export default agent;

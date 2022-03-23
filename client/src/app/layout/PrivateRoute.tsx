@@ -9,27 +9,31 @@ interface Props extends RouteProps {
 }
 
 const PrivateRoute = ({ component: Component, roles, ...rest }: Props) => {
-  const { user } = useAppSelector((state) => state.account);
+  const { user, loadingUser } = useAppSelector((state) => state.account);
   return (
-    <Route
-      {...rest}
-      render={(props) => {
-        if (!user) {
-          return (
-            <Redirect
-              to={{ pathname: '/login', state: { from: props.location } }}
-            />
-          );
-        }
+    <>
+      {loadingUser === false && (
+        <Route
+          {...rest}
+          render={(props) => {
+            if (!user) {
+              return (
+                <Redirect
+                  to={{ pathname: '/login', state: { from: props.location } }}
+                />
+              );
+            }
 
-        if (roles && !roles?.some((r) => user.roles?.includes(r))) {
-          toast.error('Not authorised to access this area');
-          return <Redirect to={{ pathname: '/catalog' }} />;
-        }
+            if (roles && !roles?.some((r) => user.roles?.includes(r))) {
+              toast.error('Not authorised to access this area');
+              return <Redirect to={{ pathname: '/catalog' }} />;
+            }
 
-        return <Component {...props} />;
-      }}
-    />
+            return <Component {...props} />;
+          }}
+        />
+      )}
+    </>
   );
 };
 
